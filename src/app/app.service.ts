@@ -16,16 +16,21 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class AppService {
-  getUserInfoFromLocalstorage(): any {
-    //throw new Error("Method not implemented.");
-  }
-  setUserInfoInLocalStorage(userDetails: any) {
-    //throw new Error("Method not implemented.");
-  }
-
+  
   private url='https://chatapi.edwisor.com'
+  
+
+
+  
 
   constructor(public http: HttpClient) { }
+ public getUserInfoFromLocalstorage=()=> {
+    return JSON.parse(localStorage.getItem('userInfo'))//throw new Error("Method not implemented.");
+  }
+  public setUserInfoInLocalStorage=(data)=> {
+    localStorage.setItem('userInfo',JSON.stringify(data))//throw new Error("Method not implemented.");
+  }
+
 
   public signupFunction(data) : Observable<any> {
     const params = new HttpParams()
@@ -49,10 +54,20 @@ export class AppService {
     return this.http.post(`${this.url}/api/v1/users/login`,params)
   }
 
+  public logout():Observable<any>{
+    const params=new HttpParams()
+    .set('authToken',Cookie.get('authToken'))
+    return this.http.post(`${this.url}/api/v1/users/logout`,params)
+  }
+
   private handleError(err:HttpErrorResponse){
     let errorMessage='';
     if(err.error instanceof Error){
       errorMessage='An error occured: ${err.error.message}';
+    }else{
+      errorMessage='Server returned code:${err.status},error message is:${err.message}';
     }
+    console.error(errorMessage);
+    return Observable.throw(errorMessage)
   }
 }
